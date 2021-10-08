@@ -1,39 +1,38 @@
 version: '3.8'
 
 services:
-#  web:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    command: python manage.py runserver 127.0.0.1:8000
-#    volumes:
-#      - .:/opt/app
-#    ports:
-#      - "8000:8000"
-#    depends_on:
-#      - db
-#      - redis
-#      - rabbitmq3
-#    env_file:
-#      - ./.env
-#  celery:
-#    build: .
-#    command: celery -A pricefetch worker -l info
-#    volumes:
-#      - .:/opt/app
-#    depends_on:
-##      - web
-#      - db
-#      - redis
-#      - rabbitmq3
-#  celery-beat:
-#    build: .
-#    command: celery -A pricefetch beat -l info
-#    volumes:
-#      - .:/opt/app
-#    depends_on:
-#      - redis
-#      - rabbitmq3
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/opt/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - rabbitmq3
+    env_file:
+      - ./.env
+  celery:
+    build: .
+    command: celery -A pricefetch worker -l info
+    volumes:
+      - .:/opt/app
+    depends_on:
+      - web
+      - db
+      - rabbitmq3
+  celery-beat:
+    build: .
+    command: celery -A pricefetch beat -l info
+    volumes:
+      - .:/opt/app
+    depends_on:
+      - rabbitmq3
 
   db:
     restart: always
@@ -49,7 +48,6 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     user: rabbitmq
-
     ports:
       - 5672:5672
       - 15672:15672
@@ -59,6 +57,3 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
       RABBITMQ_DEFAULT_VHOST: /
 
-  redis:
-    container_name: redis
-    image: redis:3.2-alpine

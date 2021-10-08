@@ -18,8 +18,14 @@ Compose.
 - The sensitive data such as alphavantage API key, should be passed from the .env
 
 
-Run celery tasks
+**Run celery tasks**
+
 celery -A pricefetch worker -l info --pool=solo
 
-Install psycopg2
+**Install psycopg2**
+
+*if problem with pipenv installation of psycopg2*
 pipenv install psycopg2-binary
+
+**env**
+.env file will be sent separate.
