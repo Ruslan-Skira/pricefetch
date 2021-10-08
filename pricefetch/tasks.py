@@ -6,7 +6,7 @@ from pricefetch.models import CurrencyExchangeRate
 from pricefetch.serializers import FetchpriceSerializer
 
 
-def fetch_price_alphavantage(data=None, from_currency='USD', to_currency='JPY'):
+def fetch_price_alphavantage(data=None, from_currency='BTC', to_currency='USD'):
     """function fetch currency exchange from alphavantage"""
 
     # replace the "demo" apikey below with your own key from https://www.alphavantage.co/support/#api-key
@@ -28,6 +28,7 @@ def fetch_price_alphavantage(data=None, from_currency='USD', to_currency='JPY'):
     return data
 
 
+@shared_task
 def fetch_price_alphavantage_hourly(from_currency='BTC', to_currency='USD'):
     """
     Periodic task running every hour to fetch data from alphavantage website
@@ -48,9 +49,3 @@ def fetch_price_alphavantage_hourly(from_currency='BTC', to_currency='USD'):
     hourly_price = FetchpriceSerializer(data=data)
     hourly_price.is_valid()
     hourly_price.save()
-    print(hourly_price)
-
-@shared_task
-def add():
-    print(1+1)
-    print('THE TASK IS WORKINT')
