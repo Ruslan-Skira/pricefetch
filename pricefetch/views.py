@@ -34,7 +34,6 @@ class FetchPriceViewSet(viewsets.ModelViewSet):
     """
     queryset = CurrencyExchangeRate.objects.all()
     serializer_class = FetchpriceSerializer
-    permission_classes = [permissions.IsAuthenticated]
     """
      Create a model instance.
      """
@@ -52,7 +51,8 @@ class FetchPriceViewSet(viewsets.ModelViewSet):
         :return: Response object with serialized data, status code and headers
         :rtype: Response
         """
-        request._full_data = fetch_price_alphavantage(request.data)  # https://stackoverflow.com/questions/33861545/how-can-modify-request-data-in-django-rest-framework/45408337
+        request._full_data = fetch_price_alphavantage(
+            request.data)  # https://stackoverflow.com/questions/33861545/how-can-modify-request-data-in-django-rest-framework/45408337
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
