@@ -53,8 +53,11 @@ class FetchPriceViewSet(viewsets.ModelViewSet):
         """
         request._full_data = fetch_price_alphavantage(
             request.data)  # https://stackoverflow.com/questions/33861545/how-can-modify-request-data-in-django-rest-framework/45408337
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        # if fetch_price_alphavantage return response not 200 or return message error
+        # return Response(serializer.data, status=status.HTTP_502_BAD_GATEWAY, headers=headers)
