@@ -1,7 +1,5 @@
-# pricefetch
-fetch the price of the currencies 
-
-
+# Project pricefetch
+Fetch the price of the currencies from open API Alpha Vantage
 
 **Backend task:**
 
@@ -17,15 +15,5 @@ containerized using Docker as well.
 Compose.
 - The sensitive data such as alphavantage API key, should be passed from the .env
 
-
-**Run celery tasks**
-
-celery -A pricefetch worker -l info --pool=solo
-
-**Install psycopg2**
-
-*if problem with pipenv installation of psycopg2*
-pipenv install psycopg2-binary
-
-**env**
-.env file will be sent separate.
+**Run project**
+look in implementation_notes.md file  [/pricefetch/implementation_notes.md](/home/user/PycharmProjects/pricefetch/implementation_notes.md)

@@ -8,8 +8,6 @@ services:
     command: >
       sh -c "python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - .:/opt/app
     ports:
       - "8000:8000"
     depends_on:
@@ -20,20 +18,19 @@ services:
   celery:
     build: .
     command: celery -A pricefetch worker -l info
-    volumes:
-      - .:/opt/app
     depends_on:
       - web
       - db
       - rabbitmq3
+    env_file:
+      - ./.env
   celery-beat:
     build: .
     command: celery -A pricefetch beat -l info
-    volumes:
-      - .:/opt/app
     depends_on:
       - rabbitmq3
-
+    env_file:
+      - ./.env
   db:
     restart: always
     image: postgres:12
@@ -43,7 +40,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - /data:/var/lib/postgresql/data
+      - ./.db-data:/var/lib/postgresql/data
   rabbitmq3:
     image: rabbitmq:3-management
     container_name: rabbitmq

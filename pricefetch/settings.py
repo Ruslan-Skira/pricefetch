@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -27,7 +29,6 @@ SECRET_KEY = 'django-insecure-*o$sg6p7@1uc_4i$%jafftc++1)q1sq!j!6urzk-)sqwk@g%@i
 DEBUG = True
 
 ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1", "localhost"]
-
 
 # Application definition
 
@@ -67,8 +68,7 @@ ROOT_URLCONF = 'pricefetch.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -88,11 +88,11 @@ WSGI_APPLICATION = 'pricefetch.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE":  os.getenv("DB_ENGINE"),
-        "NAME":  os.getenv("DB_NAME"),
+        "ENGINE": os.getenv("DB_ENGINE"),
+        "NAME": os.getenv("DB_NAME"),
         "USER": os.getenv("DB_USER"),
-        "PASSWORD":  os.getenv("DB_PASS"),
-        "HOST":  os.getenv("DB_HOST"),
+        "PASSWORD": os.getenv("DB_PASS"),
+        "HOST": os.getenv("DB_HOST"),
         "PORT": 5432,
     }
 }
