@@ -43,7 +43,7 @@ class FetchPriceViewSet(viewsets.ModelViewSet):
         """
 
         try:
-            fetch_price_alphavantage(request) # data = fetch_price_alphavantage(request)
+            fetch_price_alphavantage(request)  # data = fetch_price_alphavantage(request)
         except UserWarning as e:
             return Response(e, status=status.HTTP_502_BAD_GATEWAY)
         return super().create(request, *args, **kwargs) # CurrencyExchangeRate.objects.create(**data); return Response(200)

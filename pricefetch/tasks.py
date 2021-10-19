@@ -6,23 +6,40 @@ from django.conf import settings
 from pricefetch.serializers import FetchpriceSerializer
 from rest_framework import serializers
 
-class ResponseSerializer(serializers.Serializer):
-    realtime_currency_exchange_rate = serializers.JSONField()
 
+class CurrencyExchangeRateSerializer(serializers.Serializer):
+    from_currency_code = serializers.CharField(max_length=10)
+    from_currency_name = serializers.CharField(max_length=10)
+    to_currency_code = serializers.CharField(max_length=10)
+    to_currency_name = serializers.CharField(max_length=10)
+    exchange_rate = serializers.DecimalField(max_digits=20, decimal_places=10)
+    last_refreshed = serializers.DateTimeField()
+    time_zone = serializers.CharField(max_length=10)
+    bid_price = serializers.DecimalField(max_digits=20, decimal_places=10)
+    ask_price = serializers.DecimalField(max_digits=20, decimal_places=10)
+
+
+class ResponseSerializer(serializers.Serializer):
+    realtime_currency_exchange_rate = CurrencyExchangeRateSerializer()
+
+    # TODO: Dynamically modifying fields maybe use get_serialializer_class
 
 
 
     def validate(self, attrs):
-        """
-        Check the structure and the code of the request.
-        :param attrs:
-        :type attrs:
-        :return:
-        :rtype:
-        """
-        if r.status_code != 200:
-            raise UserWarning(r.status_code, " alphavantage response code not equal to 200")
+        from_currency_code = attrs.get('1. From_Currency Code')
+        from_currency_name = attrs.get('2. From_Currency Name')
+        to_currency_code = attrs.get('3. To_Currency Code')
+        to_currency_name = attrs.get('4. To_Currency Name')
+        exchange_rate = attrs.get('5. Exchange Rate')
+        last_refreshed = attrs.get('6. Last Refreshed')
+        time_zone = attrs.get('7. Time Zone')
+        bid_price = attrs.get('8. Bid Price')
+        ask_price = attrs.get('9. Ask Price')
 
+def validate(response):
+    if response.status_code != 200:
+        raise serializers.ValidationError(f'response status code are not equal 200 it is {response.status_code}')
 
 
 
@@ -34,6 +51,7 @@ def alphavantage_request(from_currency='BTC', to_currency='USD'):
     url = f"https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency={from_currency}&to_currency={to_currency}&apikey={settings.ALPHA_VANTAGE_API_KEY}"
 
     r = requests.get(url)
+    # TODO: validation function
     if r.status_code != 200:
         raise UserWarning(r.status_code, " alphavantage response code not equal to 200")
     try:
