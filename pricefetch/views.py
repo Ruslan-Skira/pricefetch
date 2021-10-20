@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from pricefetch.models import CurrencyExchangeRate
 from pricefetch.serializers import FetchpriceSerializer, GroupSerializer, UserSerializer
-from pricefetch.tasks import fetch_price_alphavantage
+from pricefetch.tasks import alphavantage_request
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -43,9 +43,11 @@ class FetchPriceViewSet(viewsets.ModelViewSet):
         """
 
         try:
-            fetch_price_alphavantage(request)  # data = fetch_price_alphavantage(request)
+            serializer = alphavantage_request()  # data = fetch_price_alphavantage(request)
+            serializer.is_valid()
         except UserWarning as e:
             return Response(e, status=status.HTTP_502_BAD_GATEWAY)
-        return super().create(request, *args, **kwargs) # CurrencyExchangeRate.objects.create(**data); return Response(200)
+        return Response(serializer.validated_data, status=status.HTTP_502_BAD_GATEWAY)
+        # return super().create(request, *args, **kwargs) # CurrencyExchangeRate.objects.create(**data); return Response(200)
 
 

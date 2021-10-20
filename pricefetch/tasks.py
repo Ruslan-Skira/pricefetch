@@ -8,24 +8,22 @@ from rest_framework import serializers
 
 
 class CurrencyExchangeRateSerializer(serializers.Serializer):
-    from_currency_code = serializers.CharField(max_length=10)
-    from_currency_name = serializers.CharField(max_length=10)
-    to_currency_code = serializers.CharField(max_length=10)
-    to_currency_name = serializers.CharField(max_length=10)
-    exchange_rate = serializers.DecimalField(max_digits=20, decimal_places=10)
-    last_refreshed = serializers.DateTimeField()
-    time_zone = serializers.CharField(max_length=10)
-    bid_price = serializers.DecimalField(max_digits=20, decimal_places=10)
-    ask_price = serializers.DecimalField(max_digits=20, decimal_places=10)
-
-
-class ResponseSerializer(serializers.Serializer):
-    realtime_currency_exchange_rate = CurrencyExchangeRateSerializer()
-
-    # TODO: Dynamically modifying fields maybe use get_serialializer_class
 
 
 
+
+    from_currency_code = serializers.CharField(max_length=10, source='1. From_Currency Code')
+    from_currency_name = serializers.CharField(max_length=10, source='2. From_Currency Name')
+    to_currency_code = serializers.CharField(max_length=10, source='3. To_Currency Code')
+    to_currency_name = serializers.CharField(max_length=10, source='4. To_Currency Name')
+    exchange_rate = serializers.DecimalField(max_digits=20, decimal_places=10, source='5. Exchange Rate')
+    last_refreshed = serializers.DateTimeField(source='6. Last Refreshed')
+    time_zone = serializers.CharField(max_length=10, source='7. Time Zone')
+    bid_price = serializers.DecimalField(max_digits=20, decimal_places=10, source='8. Bid Price')
+    ask_price = serializers.DecimalField(max_digits=20, decimal_places=10, source='9. Ask Price')
+
+    def to_representation(self, instance):...
+    def to_internal_value(self, data):...
     def validate(self, attrs):
         from_currency_code = attrs.get('1. From_Currency Code')
         from_currency_name = attrs.get('2. From_Currency Name')
@@ -37,9 +35,36 @@ class ResponseSerializer(serializers.Serializer):
         bid_price = attrs.get('8. Bid Price')
         ask_price = attrs.get('9. Ask Price')
 
-def validate(response):
+class ResponseSerializer(serializers.Serializer):
+    realtime_currency_exchange_rate = CurrencyExchangeRateSerializer(source="Realtime Currency Exchange Rate")
+
+
+    def validate(self, attrs):
+        realtime_currency_exchange_rate = attrs.get("Realtime Currency Exchange Rate")
+
+
+
+
+
+
+def validate_response(url: str = None):
+    try:
+        response = requests.get(url)
+    except Exception as e:
+        raise serializers.ValidationError(f'Error occurs during requests.get(url): {e}')
+
     if response.status_code != 200:
         raise serializers.ValidationError(f'response status code are not equal 200 it is {response.status_code}')
+    try:
+        r_json = response.json()
+    except Exception as e:
+        raise serializers.ValidationError(f'Response do not have json() method: {e}')
+    return r_json
+
+
+
+
+
 
 
 
@@ -50,37 +75,39 @@ def alphavantage_request(from_currency='BTC', to_currency='USD'):
     """
     url = f"https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency={from_currency}&to_currency={to_currency}&apikey={settings.ALPHA_VANTAGE_API_KEY}"
 
-    r = requests.get(url)
-    # TODO: validation function
-    if r.status_code != 200:
-        raise UserWarning(r.status_code, " alphavantage response code not equal to 200")
-    try:
-        r_json = r.json()
-    except Exception as e:
-        raise serializers.ValidationError(e, 'response do not have json() method')
+    r_json = validate_response(url)
+
 
     # TODO: use serializer
     if "Realtime Currency Exchange Rate" in r_json:
-        r_data = r_json['Realtime Currency Exchange Rate']
-        data = {}
-        try:
-            data['from_currency_code'] = r_data.get('1. From_Currency Code')
-            data['from_currency_name'] = r_data.get('2. From_Currency Name')
-            data['to_currency_code'] = r_data.get('3. To_Currency Code')
-            data['to_currency_name'] = r_data.get('4. To_Currency Name')
-            data['exchange_rate'] = r_data.get('5. Exchange Rate')
-            data['last_refreshed'] = r_data.get('6. Last Refreshed')
-            data['time_zone'] = r_data.get('7. Time Zone')
-            data['bid_price'] = r_data.get('8. Bid Price')
-            data['ask_price'] = r_data.get('9. Ask Price')
-            return data
-        except KeyError as e:
-            raise UserWarning(f'Key Error {e}')
+        return CurrencyExchangeRateSerializer(data=r_json["Realtime Currency Exchange Rate"])
+        # return ResponseSerializer(data=r_json)
+    # if "Error Message" in r_json:
+    #     serializer = ResponseSerializer(**r_json)
 
-    elif "Error Message" in r:
-        raise UserWarning(r_json["Error Message"])
-    else:
-        raise UserWarning('response 200 but structure not right')
+
+
+    # if "Realtime Currency Exchange Rate" in r_json:
+    #     r_data = r_json['Realtime Currency Exchange Rate']
+    #     data = {}
+    #     try:
+    #         data['from_currency_code'] = r_data.get('1. From_Currency Code')
+    #         data['from_currency_name'] = r_data.get('2. From_Currency Name')
+    #         data['to_currency_code'] = r_data.get('3. To_Currency Code')
+    #         data['to_currency_name'] = r_data.get('4. To_Currency Name')
+    #         data['exchange_rate'] = r_data.get('5. Exchange Rate')
+    #         data['last_refreshed'] = r_data.get('6. Last Refreshed')
+    #         data['time_zone'] = r_data.get('7. Time Zone')
+    #         data['bid_price'] = r_data.get('8. Bid Price')
+    #         data['ask_price'] = r_data.get('9. Ask Price')
+    #         return data
+    #     except KeyError as e:
+    #         raise UserWarning(f'Key Error {e}')
+    #
+    # elif "Error Message" in r_json:
+    #     raise UserWarning(r_json["Error Message"])
+    # else:
+    #     raise UserWarning('response 200 but structure not right')
 
 
 #
