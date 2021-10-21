@@ -43,11 +43,9 @@ class FetchPriceViewSet(viewsets.ModelViewSet):
         """
 
         try:
-            serializer = alphavantage_request()  # data = fetch_price_alphavantage(request)
+            serializer = alphavantage_request()
             serializer.is_valid()
+            serializer.save()
         except UserWarning as e:
             return Response(e, status=status.HTTP_502_BAD_GATEWAY)
-        return Response(serializer.validated_data, status=status.HTTP_502_BAD_GATEWAY)
-        # return super().create(request, *args, **kwargs) # CurrencyExchangeRate.objects.create(**data); return Response(200)
-
-
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
