@@ -92,5 +92,12 @@ class CurrencyExchangeRateSerializer(serializers.Serializer):
 
         return ret
 
-    def create(self, validated_data):
+    def create(self, validated_data: Dict) -> CurrencyExchangeRate:
+        """
+        Saving model instance.
+        :param validated_data:
+        :type validated_data:
+        :return:
+        :rtype:
+        """
         return CurrencyExchangeRate.objects.create(**validated_data)

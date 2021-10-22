@@ -9,13 +9,13 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task
-def fetch_price_alphavantage_hourly():
+def fetch_price_alphavantage_hourly() -> None:
     """
-    Periodic task running every hour to fetch data from alphavantage website
+    Periodic task running every hour to fetch data from alphavantage website api.
     """
     try:
         serializer = alphavantage_request()
         serializer.is_valid()
         serializer.save()
     except UserWarning as exc:
-        logger.error(f'During requesting and saving model error occurs: {exc}')
+        logger.error(f'During requesting and saving model error has been occurs: {exc}')

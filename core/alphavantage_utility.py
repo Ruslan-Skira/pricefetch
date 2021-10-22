@@ -14,11 +14,11 @@ logger = logging.getLogger(__name__)
 
 def validate_response(url: Optional[str] = None) -> json:
     """
-
-    :param url:
-    :type url:
-    :return:
-    :rtype:
+    Function validates response.
+    :param url: url for requesting alphavantage api.
+    :type url: str
+    :return: Json with data
+    :rtype: json object
     """
 
     try:
