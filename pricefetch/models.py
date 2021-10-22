@@ -14,3 +14,6 @@ class CurrencyExchangeRate(models.Model):
     time_zone = models.CharField(max_length=10, default="UTC", blank=True)
     bid_price = models.DecimalField(max_digits=18, decimal_places=8, blank=True)
     ask_price = models.DecimalField(max_digits=18, decimal_places=8, blank=True)
+
+    class Meta:
+        ordering = ['last_refreshed']
