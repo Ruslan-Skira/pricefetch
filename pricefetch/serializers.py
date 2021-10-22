@@ -37,15 +37,15 @@ class CurrencyExchangeRateSerializer(serializers.Serializer):
     """
     Base serializer for Alphavantage api.
     """
-    from_currency_code = serializers.CharField(max_length=10, source='1. From_Currency Code')
-    from_currency_name = serializers.CharField(max_length=50, source='2. From_Currency Name')
-    to_currency_code = serializers.CharField(max_length=10, source='3. To_Currency Code')
-    to_currency_name = serializers.CharField(max_length=50, source='4. To_Currency Name')
-    exchange_rate = serializers.DecimalField(max_digits=20, decimal_places=10, source='5. Exchange Rate')
-    last_refreshed = serializers.DateTimeField(source='6. Last Refreshed')
-    time_zone = serializers.CharField(max_length=10, source='7. Time Zone')
-    bid_price = serializers.DecimalField(max_digits=20, decimal_places=10, source='8. Bid Price')
-    ask_price = serializers.DecimalField(max_digits=20, decimal_places=10, source='9. Ask Price')
+    from_currency_code = serializers.CharField(max_length=10)
+    from_currency_name = serializers.CharField(max_length=50)
+    to_currency_code = serializers.CharField(max_length=10)
+    to_currency_name = serializers.CharField(max_length=50)
+    exchange_rate = serializers.DecimalField(max_digits=20, decimal_places=10)
+    last_refreshed = serializers.DateTimeField()
+    time_zone = serializers.CharField(max_length=10)
+    bid_price = serializers.DecimalField(max_digits=20, decimal_places=10)
+    ask_price = serializers.DecimalField(max_digits=20, decimal_places=10)
 
     def to_internal_value(self, data: Dict):
         """
@@ -73,7 +73,8 @@ class CurrencyExchangeRateSerializer(serializers.Serializer):
 
         for field in fields:
             validate_method = getattr(self, 'validate_' + field.field_name, None)
-            primitive_value = data.get(mapping_dict[field.field_name])
+            primitive_value = data.get(
+                mapping_dict[field.field_name])  # here is mapping model keys with alphavantage api
             try:
                 validated_value = field.run_validation(primitive_value)
                 if validate_method is not None:
@@ -85,7 +86,7 @@ class CurrencyExchangeRateSerializer(serializers.Serializer):
             except SkipField:
                 pass
             else:
-                set_value(ret, [field.field_name], validated_value)
+                set_value(ret, [field.field_name], validated_value)  # set_value takes keys in list.
 
         if errors:
             raise ValidationError(errors)
